@@ -1,6 +1,7 @@
 import json
+import datetime
 
-def create_configuration_json_file(udp_port, tcp_port, max_connections, register_to_lobby, lan_discovery):
+def create_configuration_json_file(udp_port, tcp_port, max_connections, register_to_lobby, lan_discovery, server_folder):
     register_to_lobby = int(register_to_lobby == True)
     lan_discovery = int(lan_discovery == True)
     json_data = {
@@ -11,7 +12,7 @@ def create_configuration_json_file(udp_port, tcp_port, max_connections, register
         "registerToLobby": register_to_lobby,
         "lanDiscovery": lan_discovery
     }
-    with open('Assetto Corsa Competizione Dedicated Server/server/cfg/configuration.json', 'w') as outfile:
+    with open('servers/'+server_folder+'/cfg/configuration.json', 'w') as outfile:
         json.dump(json_data, outfile, indent=4)
 
 def create_settings_json_file(server_name, password, admin_password, spectator_password, track_medal_requirement, 
@@ -19,7 +20,7 @@ def create_settings_json_file(server_name, password, admin_password, spectator_p
                                             dump_leaderboards, is_race_locked, randomize_track_when_empty,
                                             max_car_slots, central_entry_list_path, short_formation_lap,
                                             allow_auto_dq, dump_entry_list, formation_lap_type,
-                                            car_group):
+                                            car_group, server_folder):
     dump_leaderboards = int(dump_leaderboards == True)
     is_race_locked = int(is_race_locked == True)
     randomize_track_when_empty = int(randomize_track_when_empty == True)
@@ -46,7 +47,7 @@ def create_settings_json_file(server_name, password, admin_password, spectator_p
         "formationLapType": formation_lap_type,
         "carGroup": car_group
     }
-    with open('Assetto Corsa Competizione Dedicated Server/server/cfg/settings.json', 'w') as outfile:
+    with open('servers/'+server_folder+'/cfg/settings.json', 'w') as outfile:
         json.dump(json_data, outfile, indent=4)
     
 def create_event_json_file(track, pre_race_waiting_time_seconds, session_over_time_seconds,
@@ -55,7 +56,7 @@ def create_event_json_file(track, pre_race_waiting_time_seconds, session_over_ti
                             practice_session_duration, qualy_hour_of_day, qualy_day_of_weekend,
                             qualy_time_multiplier, qualy_session_duration, race_hour_of_day, 
                             race_day_of_weekend, race_time_multiplier, race_session_duration,
-                            post_qualy_seconds, post_race_seconds):
+                            post_qualy_seconds, post_race_seconds, server_folder):
     json_data = {
         "configVersion": 1,
         "track": track,
@@ -94,14 +95,14 @@ def create_event_json_file(track, pre_race_waiting_time_seconds, session_over_ti
         "simraceWeatherConditions": 0,
         "isFixedConditionQualifying": 0
     }
-    with open('Assetto Corsa Competizione Dedicated Server/server/cfg/event.json', 'w') as outfile:
+    with open('servers/'+server_folder+'/cfg/event.json', 'w') as outfile:
         json.dump(json_data, outfile, indent=4)
 
 def create_event_rules_json_file(qualifying_stand_type, pit_window_length, driver_stint_time,
                                             mandatory_pitstop_count, max_total_driving_time, max_drivers_count,
                                             is_refuelling_allowed_in_race, is_refuelling_time_fixed,
                                             is_mandatory_pitstop_refuelling_required, is_mandatory_pitstop_tyre_changed_required,
-                                            is_mandatory_pitstop_swap_driver_required, tyre_set_count):
+                                            is_mandatory_pitstop_swap_driver_required, tyre_set_count, server_folder):
     json_data = {
         "configVersion": 1,
         "qualifyStandingType": qualifying_stand_type,
@@ -117,13 +118,13 @@ def create_event_rules_json_file(qualifying_stand_type, pit_window_length, drive
         "isMandatoryPitstopSwapDriverRequired": is_mandatory_pitstop_swap_driver_required,
         "tyreSetCount": tyre_set_count
     }
-    with open('Assetto Corsa Competizione Dedicated Server/server/cfg/eventRules.json', 'w') as outfile:
+    with open('servers/'+server_folder+'/cfg/eventRules.json', 'w') as outfile:
         json.dump(json_data, outfile, indent=4)
 
 def create_assist_rules_json_file(stability_control_level_max, disable_autosteer,
                                                 disable_auto_lights, disable_auto_wiper, disable_auto_engine_start,
                                                 disable_auto_pit_limiter, disable_auto_gear, disable_auto_clutch,
-                                                disable_ideal_line):
+                                                disable_ideal_line, server_folder):
     disable_autosteer = int(disable_autosteer == True)
     disable_auto_lights = int(disable_auto_lights == True)
     disable_auto_wiper = int(disable_auto_wiper == True)
@@ -144,11 +145,11 @@ def create_assist_rules_json_file(stability_control_level_max, disable_autosteer
         "disableAutoClutch": disable_auto_clutch,
         "disableIdealLine": disable_ideal_line
     }
-    with open('Assetto Corsa Competizione Dedicated Server/server/cfg/assistRules.json', 'w') as outfile:
+    with open('servers/'+server_folder+'/cfg/assistRules.json', 'w') as outfile:
         json.dump(json_data, outfile, indent=4)
 
-def create_entry_list_json_file(registrations):
-    json_data = {"configVersion": 1, "forceEntryList": 1}
+def create_entry_list_json_file(registrations, server_folder):
+    json_data = {"configVersion": 1, "entries":[], "forceEntryList": 1}
     entry_drivers = []
     for registration in registrations:
         entry_drivers.append({
@@ -167,5 +168,5 @@ def create_entry_list_json_file(registrations):
                     "isServerAdmin": 0,
                 })
     json_data["entries"] = entry_drivers
-    with open('Assetto Corsa Competizione Dedicated Server/server/cfg/entryList.json', 'w') as outfile:
+    with open('servers/'+server_folder+'/cfg/entryList.json', 'w') as outfile:
         json.dump(json_data, outfile, indent=4)

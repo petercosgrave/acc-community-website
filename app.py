@@ -8,6 +8,9 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Le
 from flask import abort
 import datetime
 import json_creator
+from distutils.dir_util import copy_tree, remove_tree
+from pathlib import Path
+import os
 
 # Create app
 app = Flask(__name__)
@@ -16,7 +19,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SECURITY_PASSWORD_SALT'] = 'super-salt'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECURITY_POST_LOGIN_VIEW'] = '/account'
-# app.config['SQLALCHEMY_ECHO'] = True
 
 db.init_app(app)
 
@@ -36,13 +38,6 @@ security = Security(app, user_datastore)
 #                             email='peter.cosgrave.1@gmail.com', 
 #                             password=hash_password('testing1'),
 #                             active=1)
-    # event_one = Event(server_name='First Event')
-    # event_two = Event(server_name='Second Event')
-    # user = User.query.filter_by(first_name='Peter').first()
-    # registration_one = Event_Registration(event_br=event_one, user_br=user)
-    # db.session.add(event_one)
-    # db.session.add(event_two)
-    # db.session.add(registration_one)
     # db.session.commit()
 
 # Views
@@ -143,6 +138,40 @@ def edit_event():
     if form.validate_on_submit():
         form.populate_obj(event)
         db.session.commit()
+        updated_event = Event.query.filter_by(id=event_id).first()
+        server_folder = updated_event.server_start_time.strftime("%d%m%Y%H%M")
+        try:
+            remove_tree('servers/'+server_folder)
+        except:
+            print('No previous server config found, continuing...')
+        fromDirectory = 'Assetto Corsa Competizione Dedicated Server/server'
+        toDirectory = 'servers/'+server_folder
+        copy_tree(fromDirectory, toDirectory)
+        event_registrations = Event_Registration.query.filter_by(event_id=event.id).all()
+        json_creator.create_configuration_json_file(event.udp_port, event.tcp_port, event.max_connections, event.register_to_lobby, event.lan_discovery, server_folder)
+        json_creator.create_settings_json_file(event.server_name, event.password, event.admin_password, event.spectator_password, event.track_medal_requirement, 
+                                                event.safety_rating_requirement, event.racecract_rating_requirement,
+                                                event.dump_leaderboards, event.is_race_locked, event.randomize_track_when_empty,
+                                                event.max_car_slots, event.central_entry_list_path, event.short_formation_lap,
+                                                event.allow_auto_dq, event.dump_entry_list, event.formation_lap_type,
+                                                event.car_group, server_folder)
+        json_creator.create_event_json_file(event.track, event.pre_race_waiting_time_seconds, event.session_over_time_seconds,
+                                            event.ambient_temperature, event.cloud_level, event.rain, event.weather_randomness,
+                                            event.practice_hour_of_day, event.practice_day_of_weekend, event.practice_time_multiplier,
+                                            event.practice_session_duration,event.qualy_hour_of_day, event.qualy_day_of_weekend,
+                                            event.qualy_time_multiplier, event.qualy_session_duration, event.race_hour_of_day, 
+                                            event.race_day_of_weekend, event.race_time_multiplier, event.race_session_duration,
+                                            event.post_qualy_seconds, event.post_race_seconds, server_folder)
+        json_creator.create_event_rules_json_file(event.qualifying_stand_type, event.pit_window_length, event.driver_stint_time,
+                                                event.mandatory_pitstop_count, event.max_total_driving_time, event.max_drivers_count,
+                                                event.is_refuelling_allowed_in_race, event.is_refuelling_time_fixed,
+                                                event.is_mandatory_pitstop_refuelling_required, event.is_mandatory_pitstop_tyre_changed_required,
+                                                event.is_mandatory_pitstop_swap_driver_required, event.tyre_set_count, server_folder)
+        json_creator.create_assist_rules_json_file(event.stability_control_level_max, event.disable_autosteer,
+                                                    event.disable_auto_lights, event.disable_auto_wiper, event.disable_auto_engine_start,
+                                                    event.disable_auto_pit_limiter, event.disable_auto_gear, event.disable_auto_clutch,
+                                                    event.disable_ideal_line, server_folder)
+        json_creator.create_entry_list_json_file(event_registrations, server_folder)
         return render_template('edit-event.html', form=form, value='Event updated successfully')
     return render_template('edit-event.html', form=form)
 
@@ -241,6 +270,36 @@ def add_event():
                         disable_ideal_line=disable_ideal_line, server_start_time=server_start_time)
         db.session.add(new_event)
         db.session.commit()
+        server_folder = server_start_time.strftime("%d%m%Y%H%M")
+        fromDirectory = 'Assetto Corsa Competizione Dedicated Server/server'
+        toDirectory = 'servers/'+server_folder
+        copy_tree(fromDirectory, toDirectory)
+        event = Event.query.filter_by(id=new_event.id).first()
+        event_registrations = Event_Registration.query.filter_by(event_id=event.id).all()
+        json_creator.create_configuration_json_file(event.udp_port, event.tcp_port, event.max_connections, event.register_to_lobby, event.lan_discovery, server_folder)
+        json_creator.create_settings_json_file(event.server_name, event.password, event.admin_password, event.spectator_password, event.track_medal_requirement, 
+                                                event.safety_rating_requirement, event.racecract_rating_requirement,
+                                                event.dump_leaderboards, event.is_race_locked, event.randomize_track_when_empty,
+                                                event.max_car_slots, event.central_entry_list_path, event.short_formation_lap,
+                                                event.allow_auto_dq, event.dump_entry_list, event.formation_lap_type,
+                                                event.car_group, server_folder)
+        json_creator.create_event_json_file(event.track, event.pre_race_waiting_time_seconds, event.session_over_time_seconds,
+                                            event.ambient_temperature, event.cloud_level, event.rain, event.weather_randomness,
+                                            event.practice_hour_of_day, event.practice_day_of_weekend, event.practice_time_multiplier,
+                                            event.practice_session_duration,event.qualy_hour_of_day, event.qualy_day_of_weekend,
+                                            event.qualy_time_multiplier, event.qualy_session_duration, event.race_hour_of_day, 
+                                            event.race_day_of_weekend, event.race_time_multiplier, event.race_session_duration,
+                                            event.post_qualy_seconds, event.post_race_seconds, server_folder)
+        json_creator.create_event_rules_json_file(event.qualifying_stand_type, event.pit_window_length, event.driver_stint_time,
+                                                event.mandatory_pitstop_count, event.max_total_driving_time, event.max_drivers_count,
+                                                event.is_refuelling_allowed_in_race, event.is_refuelling_time_fixed,
+                                                event.is_mandatory_pitstop_refuelling_required, event.is_mandatory_pitstop_tyre_changed_required,
+                                                event.is_mandatory_pitstop_swap_driver_required, event.tyre_set_count, server_folder)
+        json_creator.create_assist_rules_json_file(event.stability_control_level_max, event.disable_autosteer,
+                                                    event.disable_auto_lights, event.disable_auto_wiper, event.disable_auto_engine_start,
+                                                    event.disable_auto_pit_limiter, event.disable_auto_gear, event.disable_auto_clutch,
+                                                    event.disable_ideal_line, server_folder)
+        json_creator.create_entry_list_json_file(event_registrations, server_folder)
         return render_template('add-event.html', form=form, value='Event added successfully')
     print(form.errors.items())
     return render_template('add-event.html', form=form)
@@ -254,6 +313,14 @@ def register_for_event():
         registration = Event_Registration(event_br=event, user_br=user)
         db.session.add(registration)
         db.session.commit()
+        server_folder = event.server_start_time.strftime("%d%m%Y%H%M")
+        file_path = Path(os.getcwd()+'/servers/'+server_folder+'/cfg/entryList.json')
+        try:
+            file_path.unlink()
+        except OSError as e:
+            print("Error: %s : %s" % (file_path, e.strerror))
+        event_registrations = Event_Registration.query.filter_by(event_id=event.id).all()
+        json_creator.create_entry_list_json_file(event_registrations, server_folder)
         return redirect(url_for('view_event', id=event_id))
     else:
         return redirect(url_for('view_event', id=event_id))
@@ -264,41 +331,18 @@ def unregister_for_event():
     if current_user.is_authenticated and Event_Registration.query.filter_by(event_id=event_id, user_id=current_user.id).first():
         Event_Registration.query.filter_by(event_id=event_id, user_id=current_user.id).delete()
         db.session.commit()
+        event = Event.query.filter_by(id=event_id).first()
+        server_folder = event.server_start_time.strftime("%d%m%Y%H%M")
+        file_path = Path(os.getcwd()+'/servers/'+server_folder+'/cfg/entryList.json')
+        try:
+            file_path.unlink()
+        except OSError as e:
+            print("Error: %s : %s" % (file_path, e.strerror))
+        event_registrations = Event_Registration.query.filter_by(event_id=event.id).all()
+        json_creator.create_entry_list_json_file(event_registrations, server_folder)
         return redirect(url_for('view_event', id=event_id))
     else:
-        return redirect(url_for('view-event', id=event_id))
-
-@app.route('/start-race-server/', methods=['POST', 'GET'])
-def start_race_server():
-    time_now = datetime.datetime.now()
-    rounded_time_now = str((time_now.replace(second=0, microsecond=0, minute=0, hour=time_now.hour).strftime('%Y-%m-%d %H:%M:%S.%f')))
-    event = Event.query.filter_by(server_start_time=rounded_time_now).first()
-    event_registrations = Event_Registration.query.filter_by(event_id=event.id).all()
-    json_creator.create_configuration_json_file(event.udp_port, event.tcp_port, event.max_connections, event.register_to_lobby, event.lan_discovery)
-    json_creator.create_settings_json_file(event.server_name, event.password, event.admin_password, event.spectator_password, event.track_medal_requirement, 
-                                            event.safety_rating_requirement, event.racecract_rating_requirement,
-                                            event.dump_leaderboards, event.is_race_locked, event.randomize_track_when_empty,
-                                            event.max_car_slots, event.central_entry_list_path, event.short_formation_lap,
-                                            event.allow_auto_dq, event.dump_entry_list, event.formation_lap_type,
-                                            event.car_group)
-    json_creator.create_event_json_file(event.track, event.pre_race_waiting_time_seconds, event.session_over_time_seconds,
-                                        event.ambient_temperature, event.cloud_level, event.rain, event.weather_randomness,
-                                        event.practice_hour_of_day, event.practice_day_of_weekend, event.practice_time_multiplier,
-                                        event.practice_session_duration,event.qualy_hour_of_day, event.qualy_day_of_weekend,
-                                        event.qualy_time_multiplier, event.qualy_session_duration, event.race_hour_of_day, 
-                                        event.race_day_of_weekend, event.race_time_multiplier, event.race_session_duration,
-                                        event.post_qualy_seconds, event.post_race_seconds)
-    json_creator.create_event_rules_json_file(event.qualifying_stand_type, event.pit_window_length, event.driver_stint_time,
-                                            event.mandatory_pitstop_count, event.max_total_driving_time, event.max_drivers_count,
-                                            event.is_refuelling_allowed_in_race, event.is_refuelling_time_fixed,
-                                            event.is_mandatory_pitstop_refuelling_required, event.is_mandatory_pitstop_tyre_changed_required,
-                                            event.is_mandatory_pitstop_swap_driver_required, event.tyre_set_count)
-    json_creator.create_assist_rules_json_file(event.stability_control_level_max, event.disable_autosteer,
-                                                event.disable_auto_lights, event.disable_auto_wiper, event.disable_auto_engine_start,
-                                                event.disable_auto_pit_limiter, event.disable_auto_gear, event.disable_auto_clutch,
-                                                event.disable_ideal_line)
-    json_creator.create_entry_list_json_file(event_registrations)
-    return 'Server Started'
+        return redirect(url_for('view_event', id=event_id))
 
 # Forms 
 class RegistrationForm(FlaskForm):
