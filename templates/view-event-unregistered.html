@@ -1,0 +1,23 @@
+<h2>View EventPage</h2>
+
+<p>
+    NOT REGISTERED FOR EVENT
+    {{ event.id }}
+    {{ event.server_name }}
+</p>
+<p><a href="{{ url_for('register_for_event', id=event.id) }}">REGISTER FOR SESION</a></p>
+{% if event_registrations is not none and event_registrations[0] is defined %}
+    <p>
+        {% for event_registration in event_registrations %}
+            {{event_registration.event_br.id}}
+            {{event_registration.event_br.server_name}}
+            {{event_registration.user_br.first_name}}
+            {{event_registration.user_br.second_name}}
+            {{event_registration.user_br.steam_id}}
+        {%endfor%}
+    </p>
+{% else %}
+    <p>
+        No users registered for session
+    </p>
+{% endif %}

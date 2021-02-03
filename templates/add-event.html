@@ -1,0 +1,275 @@
+<h2>Welcome to the Add Event Page</h2>
+
+<div>
+    <h2>Add Event</h2>
+    {% for field, errors in form.errors.items() %}
+    {{ ', '.join(errors) }}
+    {% endfor %}
+    <p>{{ value }}</p>
+    <form method="POST" action="">
+        {{ form.csrf_token() }}
+        <div>
+            {{ form.udp_port.label }}
+            {{ form.udp_port() }}
+        </div>
+        <div>
+            {{ form.tcp_port.label }}
+            {{ form.tcp_port() }}
+        </div>
+        <div>
+            {{ form.max_connections.label }}
+            {{ form.max_connections() }}
+        </div>
+        <div>
+            {{ form.register_to_lobby.label }}
+            {{ form.register_to_lobby() }}
+        </div>
+        <div>
+            {{ form.lan_discovery.label }}
+            {{ form.lan_discovery() }}
+        </div>
+        <div>
+            {{ form.server_name.label }}
+            {{ form.server_name() }}
+        </div>
+        <div>
+            {{ form.password.label }}
+            {{ form.password() }}
+        </div>
+        <div>
+            {{ form.admin_password.label }}
+            {{ form.admin_password() }}
+        </div>
+        <div>
+            {{ form.spectator_password.label }}
+            {{ form.spectator_password() }}
+        </div>
+        <div>
+            {{ form.track_medal_requirement.label }}
+            {{ form.track_medal_requirement() }}
+        </div>
+        <div>
+            {{ form.safety_rating_requirement.label }}
+            {{ form.safety_rating_requirement() }}
+        </div>
+        <div>
+            {{ form.racecract_rating_requirement.label }}
+            {{ form.racecract_rating_requirement() }}
+        </div>
+        <div>
+            {{ form.dump_leaderboards.label }}
+            {{ form.dump_leaderboards() }}
+        </div>
+        <div>
+            {{ form.is_race_locked.label }}
+            {{ form.is_race_locked() }}
+        </div>
+        <div>
+            {{ form.randomize_track_when_empty.label }}
+            {{ form.randomize_track_when_empty() }}
+        </div>
+        <div>
+            {{ form.max_car_slots.label }}
+            {{ form.max_car_slots() }}
+        </div>
+        <div>
+            {{ form.central_entry_list_path.label }}
+            {{ form.central_entry_list_path() }}
+        </div>
+        <div>
+            {{ form.short_formation_lap.label }}
+            {{ form.short_formation_lap() }}
+        </div>
+        <div>
+            {{ form.allow_auto_dq.label }}
+            {{ form.allow_auto_dq() }}
+        </div>
+        <div>
+            {{ form.dump_entry_list.label }}
+            {{ form.dump_entry_list() }}
+        </div>
+        <div>
+            {{ form.formation_lap_type.label }}
+            {{ form.formation_lap_type() }}
+        </div>
+        <div>
+            {{ form.car_group.label }}
+            {{ form.car_group() }}
+        </div>
+        <div>
+            {{ form.track.label }}
+            {{ form.track() }}
+        </div>
+        <div>
+            {{ form.pre_race_waiting_time_seconds.label }}
+            {{ form.pre_race_waiting_time_seconds() }}
+        </div>
+        <div>
+            {{ form.session_over_time_seconds.label }}
+            {{ form.session_over_time_seconds() }}
+        </div>
+        <div>
+            {{ form.ambient_temperature.label }}
+            {{ form.ambient_temperature() }}
+        </div>
+        <div>
+            {{ form.cloud_level.label }}
+            {{ form.cloud_level() }}
+        </div>
+        <div>
+            {{ form.rain.label }}
+            {{ form.rain() }}
+        </div>
+        <div>
+            {{ form.weather_randomness.label }}
+            {{ form.weather_randomness() }}
+        </div>
+        <div>
+            {{ form.post_qualy_seconds.label }}
+            {{ form.post_qualy_seconds() }}
+        </div>
+        <div>
+            {{ form.post_race_seconds.label }}
+            {{ form.post_race_seconds() }}
+        </div>
+        <div>
+            {{ form.practice_hour_of_day.label }}
+            {{ form.practice_hour_of_day() }}
+        </div>
+        <div>
+            {{ form.practice_day_of_weekend.label }}
+            {{ form.practice_day_of_weekend() }}
+        </div>
+        <div>
+            {{ form.practice_time_multiplier.label }}
+            {{ form.practice_time_multiplier() }}
+        </div>
+        <div>
+            {{ form.practice_session_duration.label }}
+            {{ form.practice_session_duration() }}
+        </div>
+        <div>
+            {{ form.qualy_hour_of_day.label }}
+            {{ form.qualy_hour_of_day() }}
+        </div>
+        <div>
+            {{ form.qualy_day_of_weekend.label }}
+            {{ form.qualy_day_of_weekend() }}
+        </div>
+        <div>
+            {{ form.qualy_time_multiplier.label }}
+            {{ form.qualy_time_multiplier() }}
+        </div>
+        <div>
+            {{ form.qualy_session_duration.label }}
+            {{ form.qualy_session_duration() }}
+        </div>
+        <div>
+            {{ form.race_hour_of_day.label }}
+            {{ form.race_hour_of_day() }}
+        </div>
+        <div>
+            {{ form.race_day_of_weekend.label }}
+            {{ form.race_day_of_weekend() }}
+        </div>
+        <div>
+            {{ form.race_time_multiplier.label }}
+            {{ form.race_time_multiplier() }}
+        </div>
+        <div>
+            {{ form.race_session_duration.label }}
+            {{ form.race_session_duration() }}
+        </div>
+        <div>
+            {{ form.qualifying_stand_type.label }}
+            {{ form.qualifying_stand_type() }}
+        </div>
+        <div>
+            {{ form.pit_window_length.label }}
+            {{ form.pit_window_length() }}
+        </div>
+        <div>
+            {{ form.driver_stint_time.label }}
+            {{ form.driver_stint_time() }}
+        </div>
+        <div>
+            {{ form.mandatory_pitstop_count.label }}
+            {{ form.mandatory_pitstop_count() }}
+        </div>
+        <div>
+            {{ form.max_total_driving_time.label }}
+            {{ form.max_total_driving_time() }}
+        </div>
+        <div>
+            {{ form.max_drivers_count.label }}
+            {{ form.max_drivers_count() }}
+        </div>
+        <div>
+            {{ form.tyre_set_count.label }}
+            {{ form.tyre_set_count() }}
+        </div>
+        <div>
+            {{ form.is_refuelling_allowed_in_race.label }}
+            {{ form.is_refuelling_allowed_in_race() }}
+        </div>
+        <div>
+            {{ form.is_refuelling_time_fixed.label }}
+            {{ form.is_refuelling_time_fixed() }}
+        </div>
+        <div>
+            {{ form.is_mandatory_pitstop_refuelling_required.label }}
+            {{ form.is_mandatory_pitstop_refuelling_required() }}
+        </div>
+        <div>
+            {{ form.is_mandatory_pitstop_tyre_changed_required.label }}
+            {{ form.is_mandatory_pitstop_tyre_changed_required() }}
+        </div>
+        <div>
+            {{ form.is_mandatory_pitstop_swap_driver_required.label }}
+            {{ form.is_mandatory_pitstop_swap_driver_required() }}
+        </div>
+        <div>
+            {{ form.stability_control_level_max.label }}
+            {{ form.stability_control_level_max() }}
+        </div>
+        <div>
+            {{ form.disable_autosteer.label }}
+            {{ form.disable_autosteer() }}
+        </div>
+        <div>
+            {{ form.disable_auto_lights.label }}
+            {{ form.disable_auto_lights() }}
+        </div>
+        <div>
+            {{ form.disable_auto_wiper.label }}
+            {{ form.disable_auto_wiper() }}
+        </div>
+        <div>
+            {{ form.disable_auto_engine_start.label }}
+            {{ form.disable_auto_engine_start() }}
+        </div>
+        <div>
+            {{ form.disable_auto_pit_limiter.label }}
+            {{ form.disable_auto_pit_limiter() }}
+        </div>
+        <div>
+            {{ form.disable_auto_gear.label }}
+            {{ form.disable_auto_gear() }}
+        </div>
+        <div>
+            {{ form.disable_auto_clutch.label }}
+            {{ form.disable_auto_clutch() }}
+        </div>
+        <div>
+            {{ form.disable_ideal_line.label }}
+            {{ form.disable_ideal_line() }}
+        </div>
+        <div>
+            {{ form.server_start_time.label }}
+            {{ form.server_start_time() }}
+        </div>
+        <div>
+            {{ form.submit(class="btn btn-primary")}}
+        </div>
+    </form>
+</div>

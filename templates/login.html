@@ -1,0 +1,24 @@
+<div>
+    <h2>Login</h2>
+    {% for field, errors in form.errors.items() %}
+    {{ ', '.join(errors) }}
+    {% endfor %}
+    <p>{{ value }}</p>
+    <form method="POST" action="">
+        {{ form.csrf_token() }}
+        <div>
+            {{ form.email.label }}
+            {{ form.email() }}
+        </div>
+        <div>
+            {{ form.password.label }}
+            {{ form.password() }}
+        </div>
+        <div>
+            {{ form.submit(class="btn btn-primary")}}
+        </div>
+    </form>
+</div>
+ 
+<h3>Dont Have an account??</h3>
+<h3><a href = "{{url_for('register') }}">Register Here</a></h3>

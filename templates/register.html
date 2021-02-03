@@ -1,0 +1,40 @@
+<div>
+    <h2>Registration Form</h2>
+    {% for field, errors in form.errors.items() %}
+    {{ ', '.join(errors) }}
+    {% endfor %}
+    <p>{{ value }}</p>
+    <form method="POST">
+        {{ form.csrf_token() }}
+        <div>
+            {{ form.first_name.label }}
+            {{ form.first_name(class="form-control") }}
+        </div>
+        <div>
+            {{ form.second_name.label }}
+            {{ form.second_name(class="form-control") }}
+        </div>
+        <div>
+            {{ form.short_name.label }}
+            {{ form.short_name(class="form-control") }}
+        </div>
+        <div>
+            {{ form.steam_id.label }}
+            {{ form.steam_id(class="form-control") }}
+        </div>
+        <div>
+            {{ form.email.label }}
+            {{ form.email(class="form-control") }}
+        </div>
+        <div>
+            {{ form.password.label }}
+            {{ form.password(class="form-control") }}
+        </div>
+        <div>
+            {{ form.submit(class="btn btn-primary")}}
+        </div>
+    </form>
+</div>
+ 
+<h3>Already Have an Account?</h3>
+<h3><a href ="{{ url_for_security('login') }}">Login Here</a></h3>

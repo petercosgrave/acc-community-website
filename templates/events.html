@@ -1,0 +1,13 @@
+<h2>Welcome to the Events Page</h2>
+
+{% for event in events %}
+    <p><a href="{{ url_for('view_event', id=event.id) }}">{{event.id}}
+    {{event.server_name}}</a></p>
+{%endfor%}
+
+<p>{% for event_registration in event_registrations %}
+    {{event_registration.event_br.id}}
+    {{event_registration.event_br.server_name}}
+    {{event_registration.user_br.first_name}}
+    {{event_registration.user_br.second_name}}
+   {%endfor%}</p>

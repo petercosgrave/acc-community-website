@@ -1,0 +1,37 @@
+<h2>My Account</h2>
+ 
+<h3>Hi {{ current_user.first_name + ' ' +  current_user.second_name }}</h3>
+<a href="{{ url_for('logout')}}">Logout Here</a>
+<div>
+    <h2>Profile</h2>
+    {% for field, errors in form.errors.items() %}
+    {{ ', '.join(errors) }}
+    {% endfor %}
+    <p>{{ value }}</p>
+    <form method="POST" action="">
+        {{ form.csrf_token() }}
+        <div>
+            {{ form.first_name.label }}
+            {{ form.first_name() }}
+        </div>
+        <div>
+            {{ form.second_name.label }}
+            {{ form.second_name() }}
+        </div>
+        <div>
+            {{ form.short_name.label }}
+            {{ form.short_name() }}
+        </div>
+        <div>
+            {{ form.steam_id.label }}
+            {{ form.steam_id() }}
+        </div>
+        <div>
+            {{ form.email.label }}
+            {{ form.email() }}
+        </div>
+        <div>
+            {{ form.submit(class="btn btn-primary")}}
+        </div>
+    </form>
+</div>
