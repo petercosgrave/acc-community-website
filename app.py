@@ -28,16 +28,16 @@ security = Security(app, user_datastore)
 
 # Create a user to test with
 @app.before_first_request
-# def create_user():
-#     db.create_all()
-#     user_datastore.create_role(name='admin',description='Ultimate user')
-#     user_datastore.create_user(first_name='Peter', 
-#                             second_name='Cosgrave',
-#                             short_name='COS', 
-#                             steam_id=12345678901234567, 
-#                             email='peter.cosgrave.1@gmail.com', 
-#                             password=hash_password('testing1'),
-#                             active=1)
+def create_user():
+    db.create_all()
+    # user_datastore.create_role(name='admin',description='Ultimate user')
+    # user_datastore.create_user(first_name='Peter', 
+    #                         second_name='Cosgrave',
+    #                         short_name='COS', 
+    #                         steam_id=12345678901234567, 
+    #                         email='peter.cosgrave.1@gmail.com', 
+    #                         password=hash_password('testing1'),
+    #                         active=1)
     # db.session.commit()
 
 # Views
