@@ -132,6 +132,7 @@ def view_event():
 def edit_event():
     event_id = request.args.get('id')
     event = Event.query.filter_by(id=event_id).first()
+    old_event_time = event.server_start_time.strftime("%d%m%Y%H%M")
     if not event:
         abort(404)
     form = UpdateEventForm(obj=event)
@@ -141,7 +142,7 @@ def edit_event():
         updated_event = Event.query.filter_by(id=event_id).first()
         server_folder = updated_event.server_start_time.strftime("%d%m%Y%H%M")
         try:
-            remove_tree('servers/'+server_folder)
+            remove_tree('servers/'+old_event_time)
         except:
             print('No previous server config found, continuing...')
         fromDirectory = 'Assetto Corsa Competizione Dedicated Server/server'
