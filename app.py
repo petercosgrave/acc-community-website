@@ -11,6 +11,8 @@ import json_creator
 from distutils.dir_util import copy_tree, remove_tree
 from pathlib import Path
 import os
+import subprocess
+import psutil
 
 # Create app
 app = Flask(__name__)
@@ -344,6 +346,37 @@ def unregister_for_event():
         return redirect(url_for('view_event', id=event_id))
     else:
         return redirect(url_for('view_event', id=event_id))
+
+@app.route('/start-server/', methods=['POST', 'GET'])
+def start_server():
+    event_type = request.args.get('event_type')
+    if event_type == 'hourly':
+        time_now = datetime.datetime.now()
+        formatted_time_now = time_now.strftime("%d%m%Y%H00")
+        current_directory = r"C:\Users\peter\Documents\acc-community-website\servers\\"+formatted_time_now
+        exe_file = r"C:\Users\peter\Documents\acc-community-website\servers\\"+formatted_time_now+r"\\accServer.exe"
+        game_server = subprocess.Popen(args=exe_file, cwd=current_directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+        event = Event.query.filter_by(server_start_time=time_now.strftime('%Y-%m-%d %H:00:00.000000')).first()
+        event.pid=game_server.pid
+        db.session.commit()
+        return 'Server Started: ' + str(game_server.pid)
+    else:
+        return 'No event of this type to start'
+
+@app.route('/stop-server/', methods=['POST', 'GET'])
+def stop_server():
+    event_type = request.args.get('event_type')
+    if event_type == 'hourly':
+        time_now = datetime.datetime.now()
+        formatted_time_now = time_now.strftime("%d%m%Y%H00")
+        event = Event.query.filter_by(server_start_time=time_now.strftime('%Y-%m-%d %H:00:00.000000')).first()
+        p = psutil.Process(int(event.pid))
+        p.terminate()
+        event.pid = 0
+        db.session.commit()
+        return 'Server Stopped'
+    else:
+        return 'No event of this type to stop'
 
 # Forms 
 class RegistrationForm(FlaskForm):

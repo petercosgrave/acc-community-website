@@ -100,6 +100,7 @@ class Event(db.Model):
     disable_auto_clutch = db.Column(db.Boolean, default=False)
     disable_ideal_line = db.Column(db.Boolean, default=False)
     server_start_time = db.Column(db.DateTime)
+    pid = db.Column(db.Integer, nullable=True)
     event_registrations = db.relationship('Event_Registration', backref='event_br', lazy=True)
 class Event_Registration(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -34,7 +34,7 @@ def create_settings_json_file(server_name, password, admin_password, spectator_p
         "adminPassword": admin_password,
         "spectatorPassword": spectator_password,
         "trackMedalsRequirement": track_medal_requirement,
-        "safetRatingRequirement": safety_rating_requirement,
+        "safetyRatingRequirement": safety_rating_requirement,
         "raceCraftRatingRequirement": racecract_rating_requirement,
         "dumpLeaderboards": dump_leaderboards,
         "isRaceLocked": is_race_locked,
