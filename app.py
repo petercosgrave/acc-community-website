@@ -107,6 +107,7 @@ def register():
     return render_template('register.html', form=form)
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
 
@@ -131,6 +132,8 @@ def view_event():
     return render_template('view-event-logged-out.html', event=event, event_registrations=event_registrations)
 
 @app.route('/edit-event/', methods=['POST', 'GET'])
+@login_required
+@roles_required('Admin')
 def edit_event():
     event_id = request.args.get('id')
     event = Event.query.filter_by(id=event_id).first()
@@ -179,6 +182,8 @@ def edit_event():
     return render_template('edit-event.html', form=form)
 
 @app.route('/add-event/', methods=['POST', 'GET'])
+@login_required
+@roles_required('Admin')
 def add_event():
     form = UpdateEventForm()
     if form.validate_on_submit():
@@ -308,6 +313,7 @@ def add_event():
     return render_template('add-event.html', form=form)
 
 @app.route('/register-for-event/', methods=['POST', 'GET'])
+@login_required
 def register_for_event():
     event_id = request.args.get('id')
     event = Event.query.filter_by(id=event_id).first()
@@ -329,6 +335,7 @@ def register_for_event():
         return redirect(url_for('view_event', id=event_id))
 
 @app.route('/unregister-for-event/', methods=['POST', 'GET'])
+@login_required
 def unregister_for_event():
     event_id = request.args.get('id')
     if current_user.is_authenticated and Event_Registration.query.filter_by(event_id=event_id, user_id=current_user.id).first():
@@ -348,6 +355,8 @@ def unregister_for_event():
         return redirect(url_for('view_event', id=event_id))
 
 @app.route('/start-server/', methods=['POST', 'GET'])
+@login_required
+@roles_required('Admin')
 def start_server():
     event_type = request.args.get('event_type')
     if event_type == 'hourly':
@@ -364,6 +373,8 @@ def start_server():
         return 'No event of this type to start'
 
 @app.route('/stop-server/', methods=['POST', 'GET'])
+@login_required
+@roles_required('Admin')
 def stop_server():
     event_type = request.args.get('event_type')
     if event_type == 'hourly':
