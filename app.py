@@ -13,6 +13,7 @@ from pathlib import Path
 import os
 import subprocess
 import psutil
+import results
 
 # Create app
 app = Flask(__name__)
@@ -384,6 +385,12 @@ def stop_server():
         p = psutil.Process(int(event.pid))
         p.terminate()
         event.pid = 0
+        # Add in reading of results and writing to DB
+        practice_results = results.read_fp_results(time_now.strftime("%d%m%Y%H00"))
+        quali_results = results.read_q_results(time_now.strftime("%d%m%Y%H00"))
+        race_results = results.read_r_results(time_now.strftime("%d%m%Y%H00"))
+        print(practice_results)
+        
         db.session.commit()
         return 'Server Stopped'
     else:
