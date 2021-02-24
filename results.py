@@ -25,4 +25,4 @@ def read_r_results(server_folder):
     with open(latest_file, encoding='utf-16-le') as json_file:
         data = json.load(json_file)
         return data
-    
+        

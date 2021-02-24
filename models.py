@@ -28,6 +28,7 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary=roles_users,
                             backref=db.backref('users', lazy='dynamic'))
     event_registrations = db.relationship('Event_Registration', backref='user_br', lazy=True)
+    event_results = db.relationship('Event_Results', backref='user_results_br', lazy=True)
  
 @login.user_loader
 def load_user(id):
@@ -102,7 +103,41 @@ class Event(db.Model):
     server_start_time = db.Column(db.DateTime)
     pid = db.Column(db.Integer, nullable=True)
     event_registrations = db.relationship('Event_Registration', backref='event_br', lazy=True)
+    event_stats = db.relationship('Event_Stats', backref='event_stats_br', lazy=True)
+    event_results = db.relationship('Event_Results', backref='event_results_br', lazy=True)
+
 class Event_Registration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+class Event_Stats(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    session_type = db.Column(db.String(3), nullable=False)
+    best_lap = db.Column(db.Integer, nullable=False)
+    best_sector_one = db.Column(db.Integer, nullable=False)
+    best_sector_two = db.Column(db.Integer, nullable=False)
+    best_sector_three = db.Column(db.Integer, nullable=False)
+
+class Event_Results(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
+    session_type = db.Column(db.String(3), nullable=False)
+    finish_position = db.Column(db.Integer, nullable=False)
+    car_model = db.Column(db.Integer, db.ForeignKey('car__models.model_id'), nullable=False)
+    best_lap = db.Column(db.Integer, nullable=False)
+    best_sector_one = db.Column(db.Integer, nullable=False)
+    best_sector_two = db.Column(db.Integer, nullable=False)
+    best_sector_three = db.Column(db.Integer, nullable=False)
+    total_time = db.Column(db.Integer, nullable=False)
+    lap_count = db.Column(db.Integer, nullable=False)
+
+class Car_Models(db.Model):
+    model_id = db.Column(db.Integer, primary_key=True)
+    model_name = db.Column(db.String(255), nullable=False)
+    model_year = db.Column(db.Integer, nullable=False)
+    model_class = db.Column(db.String(10), nullable=False)
+    car_results = db.relationship('Event_Results', backref='car_model_br', lazy=True)
+

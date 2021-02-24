@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_security import Security, SQLAlchemyUserDatastore, login_required, current_user, login_user, logout_user, roles_required
 from flask_security.utils import hash_password
-from models import db, User, Role, Event, Event_Registration
+from models import db, User, Role, Event, Event_Registration, Event_Stats, Event_Results
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, IntegerField, BooleanField, DecimalField, DateTimeField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, InputRequired
@@ -386,11 +386,64 @@ def stop_server():
         p.terminate()
         event.pid = 0
         # Add in reading of results and writing to DB
-        practice_results = results.read_fp_results(time_now.strftime("%d%m%Y%H00"))
+        fp_results = results.read_fp_results(time_now.strftime("%d%m%Y%H00"))
         quali_results = results.read_q_results(time_now.strftime("%d%m%Y%H00"))
         race_results = results.read_r_results(time_now.strftime("%d%m%Y%H00"))
-        print(practice_results)
+        # event stats
+        fp_event_stats = Event_Stats(event_id=event.id, session_type=fp_results['sessionType'], 
+                        best_lap=fp_results['sessionResult']['bestlap'], 
+                        best_sector_one=fp_results['sessionResult']['bestSplits'][0], 
+                        best_sector_two=fp_results['sessionResult']['bestSplits'][1], 
+                        best_sector_three=fp_results['sessionResult']['bestSplits'][2])
+        db.session.add(fp_event_stats)
+        q_event_stats = Event_Stats(event_id=event.id, session_type=quali_results['sessionType'], 
+                        best_lap=quali_results['sessionResult']['bestlap'], 
+                        best_sector_one=quali_results['sessionResult']['bestSplits'][0], 
+                        best_sector_two=quali_results['sessionResult']['bestSplits'][1], 
+                        best_sector_three=quali_results['sessionResult']['bestSplits'][2])
+        db.session.add(q_event_stats)
+        r_event_stats = Event_Stats(event_id=event.id, session_type=race_results['sessionType'], 
+                        best_lap=race_results['sessionResult']['bestlap'], 
+                        best_sector_one=race_results['sessionResult']['bestSplits'][0], 
+                        best_sector_two=race_results['sessionResult']['bestSplits'][1], 
+                        best_sector_three=race_results['sessionResult']['bestSplits'][2])
+        db.session.add(r_event_stats)
+        # results
+        for x in range(0, len(fp_results['sessionResult']['leaderBoardLines'])):
+            user = User.query.filter_by(steam_id=fp_results['sessionResult']['leaderBoardLines'][x]['currentDriver']['playerId'][1:]).first()
+            fp_event_results = Event_Results(user_id=user.id, event_id=event.id, session_type=fp_results['sessionType'],
+                                            finish_position=x+1, car_model=fp_results['sessionResult']['leaderBoardLines'][x]['car']['carModel'],
+                                            best_lap=fp_results['sessionResult']['leaderBoardLines'][x]['timing']['bestLap'],
+                                            best_sector_one=fp_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][0],
+                                            best_sector_two=fp_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][1],
+                                            best_sector_three=fp_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][2],
+                                            total_time=fp_results['sessionResult']['leaderBoardLines'][x]['timing']['totalTime'],
+                                            lap_count=fp_results['sessionResult']['leaderBoardLines'][x]['timing']['lapCount'])
+            db.session.add(fp_event_results)
         
+        for x in range(0, len(quali_results['sessionResult']['leaderBoardLines'])):
+            user = User.query.filter_by(steam_id=quali_results['sessionResult']['leaderBoardLines'][x]['currentDriver']['playerId'][1:]).first()
+            q_event_results = Event_Results(user_id=user.id, event_id=event.id, session_type=quali_results['sessionType'],
+                                            finish_position=x+1, car_model=quali_results['sessionResult']['leaderBoardLines'][x]['car']['carModel'],
+                                            best_lap=quali_results['sessionResult']['leaderBoardLines'][x]['timing']['bestLap'],
+                                            best_sector_one=quali_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][0],
+                                            best_sector_two=quali_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][1],
+                                            best_sector_three=quali_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][2],
+                                            total_time=quali_results['sessionResult']['leaderBoardLines'][x]['timing']['totalTime'],
+                                            lap_count=quali_results['sessionResult']['leaderBoardLines'][x]['timing']['lapCount'])
+            db.session.add(q_event_results)
+
+        for x in range(0, len(race_results['sessionResult']['leaderBoardLines'])):
+            user = User.query.filter_by(steam_id=race_results['sessionResult']['leaderBoardLines'][x]['currentDriver']['playerId'][1:]).first()
+            r_event_results = Event_Results(user_id=user.id, event_id=event.id, session_type=race_results['sessionType'],
+                                            finish_position=x+1, car_model=race_results['sessionResult']['leaderBoardLines'][x]['car']['carModel'],
+                                            best_lap=race_results['sessionResult']['leaderBoardLines'][x]['timing']['bestLap'],
+                                            best_sector_one=race_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][0],
+                                            best_sector_two=race_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][1],
+                                            best_sector_three=race_results['sessionResult']['leaderBoardLines'][x]['timing']['bestSplits'][2],
+                                            total_time=race_results['sessionResult']['leaderBoardLines'][x]['timing']['totalTime'],
+                                            lap_count=race_results['sessionResult']['leaderBoardLines'][x]['timing']['lapCount'])
+            db.session.add(r_event_results)
         db.session.commit()
         return 'Server Stopped'
     else:
