@@ -54,12 +54,13 @@ def home():
 def account():
     user = User.query.filter_by(id = current_user.id).first()
     event_registrations = Event_Registration.query.filter_by(user_id=user.id).all()
+    ordered_event_registrations = sorted(event_registrations, key=lambda rec: rec.event_br.server_start_time, reverse=True)
     form = UpdateForm(obj=user)
     if form.validate_on_submit():
         form.populate_obj(user)
         db.session.commit()
         return render_template('account.html', form=form, value='Profile updated successfully', event_registrations=event_registrations)
-    return render_template('account.html', form=form, event_registrations=event_registrations)
+    return render_template('account.html', form=form, event_registrations=ordered_event_registrations)
 
 # @app.route('/login/', methods = ['POST', 'GET'])
 # def login():
