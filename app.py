@@ -14,6 +14,7 @@ import os
 import subprocess
 import psutil
 import results
+from sqlalchemy import desc, asc
 
 # Create app
 app = Flask(__name__)
@@ -52,12 +53,13 @@ def home():
 @login_required
 def account():
     user = User.query.filter_by(id = current_user.id).first()
+    event_registrations = Event_Registration.query.filter_by(user_id=user.id).all()
     form = UpdateForm(obj=user)
     if form.validate_on_submit():
         form.populate_obj(user)
         db.session.commit()
-        return render_template('account.html', form=form, value='Profile updated successfully')
-    return render_template('account.html', form=form)
+        return render_template('account.html', form=form, value='Profile updated successfully', event_registrations=event_registrations)
+    return render_template('account.html', form=form, event_registrations=event_registrations)
 
 # @app.route('/login/', methods = ['POST', 'GET'])
 # def login():
@@ -114,12 +116,14 @@ def logout():
 
 @app.route('/events/')
 def events():
-    events = Event.query.all()
-    event_registrations = Event_Registration.query.all()
-    return render_template('events.html', events=events, event_registrations=event_registrations)
+    events = Event.query.order_by(desc(Event.server_start_time)).all()
+    event_registrations = Event_Registration.query.limit(10).all()
+    time_now = datetime.datetime.now()
+    return render_template('events.html', events=events, event_registrations=event_registrations, time_now=time_now)
 
 @app.route('/view-event/', methods=['GET'])
 def view_event():
+    time_now = datetime.datetime.now()
     event_id = request.args.get('id')
     event = Event.query.filter_by(id=event_id).first()
     event_registrations = Event_Registration.query.filter_by(event_id=event_id).all()
@@ -127,10 +131,11 @@ def view_event():
         abort(404)
     if current_user.is_authenticated:
         if Event_Registration.query.filter_by(event_id=event_id, user_id=current_user.id).first():
-            return render_template('view-event-logged-in.html', event=event, event_registrations=event_registrations)
+            return render_template('view-event.html', event=event, event_registrations=event_registrations, registered=True, time_now=time_now)
         else:
-            return render_template('view-event-unregistered.html', event=event, event_registrations=event_registrations)
-    return render_template('view-event-logged-out.html', event=event, event_registrations=event_registrations)
+            return render_template('view-event.html', event=event, event_registrations=event_registrations, registered=False, time_now=time_now)
+    else:
+        return render_template('view-event.html', event=event, event_registrations=event_registrations, registered=False, time_now=time_now)
 
 @app.route('/edit-event/', methods=['POST', 'GET'])
 @login_required
@@ -319,7 +324,8 @@ def register_for_event():
     event_id = request.args.get('id')
     event = Event.query.filter_by(id=event_id).first()
     user = User.query.filter_by(id = current_user.id).first()
-    if current_user.is_authenticated and not Event_Registration.query.filter_by(event_id=event_id, user_id=current_user.id).first():
+    time_now = datetime.datetime.now()
+    if current_user.is_authenticated and not Event_Registration.query.filter_by(event_id=event_id, user_id=current_user.id).first() and time_now < event.server_start_time:
         registration = Event_Registration(event_br=event, user_br=user)
         db.session.add(registration)
         db.session.commit()
@@ -368,6 +374,7 @@ def start_server():
         game_server = subprocess.Popen(args=exe_file, cwd=current_directory, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
         event = Event.query.filter_by(server_start_time=time_now.strftime('%Y-%m-%d %H:00:00.000000')).first()
         event.pid=game_server.pid
+        event.is_started = 1
         db.session.commit()
         return 'Server Started: ' + str(game_server.pid)
     else:
@@ -385,6 +392,7 @@ def stop_server():
         p = psutil.Process(int(event.pid))
         p.terminate()
         event.pid = 0
+        event.is_complete = 1
         # Add in reading of results and writing to DB
         fp_results = results.read_fp_results(time_now.strftime("%d%m%Y%H00"))
         quali_results = results.read_q_results(time_now.strftime("%d%m%Y%H00"))
@@ -448,6 +456,20 @@ def stop_server():
         return 'Server Stopped'
     else:
         return 'No event of this type to stop'
+
+@app.route('/view-results/', methods=['GET'])
+def view_results():
+    event_id = request.args.get('id')
+    event_results = Event_Results.query.filter_by(event_id=event_id).order_by(asc(Event_Results.finish_position)).all()
+    for event_result in event_results:
+        event_result.best_sector_one = results.convert_result_to_seconds(event_result.best_sector_one)
+        event_result.best_sector_two = results.convert_result_to_seconds(event_result.best_sector_two)
+        event_result.best_sector_three = results.convert_result_to_seconds(event_result.best_sector_three)
+        event_result.best_lap = results.convert_result_to_minutes(event_result.best_lap)
+        event_result.total_time = results.convert_result_to_minutes(event_result.total_time)
+    if not event_results:
+        abort(404)
+    return render_template('view-results.html', event_results=event_results)
 
 # Forms 
 class RegistrationForm(FlaskForm):

@@ -102,6 +102,8 @@ class Event(db.Model):
     disable_ideal_line = db.Column(db.Boolean, default=False)
     server_start_time = db.Column(db.DateTime)
     pid = db.Column(db.Integer, nullable=True)
+    is_started = db.Column(db.Boolean, default=False, nullable=True)
+    is_complete = db.Column(db.Boolean, default=False, nullable=True)
     event_registrations = db.relationship('Event_Registration', backref='event_br', lazy=True)
     event_stats = db.relationship('Event_Stats', backref='event_stats_br', lazy=True)
     event_results = db.relationship('Event_Results', backref='event_results_br', lazy=True)

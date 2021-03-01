@@ -1,0 +1,60 @@
+<h2>View EventPage</h2>
+
+<h2>Menu</h2>
+<ul>
+    <li><a href = "{{url_for('home')}}">Home</a></li>
+    <li><a href = "{{url_for('events')}}">Events</a></li>
+    {% if current_user.is_authenticated %}
+        <li><a href = "{{url_for('account')}}">Account</a></li>
+        <li><a href = "{{url_for('logout')}}">Logout</a></li>
+    {% else %}
+        <li><a href = "{{ url_for_security('login') }}">Login</a></li>
+    {% endif %}
+</ul>
+
+{% if time_now < event.server_start_time %}
+    {% if registered and current_user.is_authenticated %}
+        <p><a href="{{ url_for('unregister_for_event', id=event.id) }}">UNREGISTER FOR SESION</a></p>
+    {% elif not registered and current_user.is_authenticated and  event_registrations|length < event.max_connections %}
+        <p><a href="{{ url_for('register_for_event', id=event.id) }}">REGISTER FOR SESION</a></p>
+    {% elif not  current_user.is_authenticated%}
+        <a href = "{{ url_for_security('login') }}">Login to register</a>
+    {% endif %}
+{% endif %}
+
+{% if event.is_started == True and event.is_complete == None %}
+    <p>Live Now!</p>
+{% endif %}
+
+<p>Event Details</p>
+{% if current_user.has_role('Admin') %} 
+    <a href="{{ url_for('edit_event', id=event.id) }}">Edit Event</a>
+{% endif %}
+
+{% if event.is_complete == True %}
+<a href="{{ url_for('view_results', id=event.id) }}">Results</a>
+{% endif %}
+
+<ul>
+    <li>Sever Name: {{ event.server_name }}</li>
+    <li>Start Time: {{ event.server_start_time }}</li>
+    <li>Track: {{ event.track }} </li>
+    <li>Car Group: {{ event.car_group }} </li>
+    <li>Max Entries: {{ event.max_connections }} </li>
+    <li>Practice: {{ event.practice_session_duration }} Minutes </li>
+    <li>Qualifying: {{ event.qualy_session_duration }} Minutes</li>
+    <li>Race: {{ event.race_session_duration }} Minutes</li>
+</ul>
+
+<p>Registered Drivers {{event_registrations|length}} / {{ event.max_connections }}</p>
+{% if event_registrations is not none and event_registrations[0] is defined %}
+    <ol>
+    {% for event_registration in event_registrations %}
+        <li>{{event_registration.user_br.first_name}} {{event_registration.user_br.second_name}}</li>
+    {%endfor%}
+    </ol>
+{% else %}
+    <p>
+        No users registered for session
+    </p>
+{% endif %}

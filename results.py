@@ -25,4 +25,16 @@ def read_r_results(server_folder):
     with open(latest_file, encoding='utf-16-le') as json_file:
         data = json.load(json_file)
         return data
-        
+
+def convert_result_to_seconds(milliseconds):
+    seconds, milliseconds = divmod(milliseconds,1000)
+    seconds = seconds+milliseconds/1000
+    return f"{seconds:.3f}"
+
+def convert_result_to_minutes(milliseconds):
+    seconds, milliseconds = divmod(milliseconds,1000)
+    minutes, seconds = divmod(seconds, 60)
+    seconds = f"{seconds+milliseconds/1000:.3f}"
+    result = str(minutes) + ':' + str(seconds)
+    return result
+    

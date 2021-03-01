@@ -1,7 +1,18 @@
 <h2>My Account</h2>
+
+<h2>Menu</h2>
+<ul>
+    <li><a href = "{{url_for('home')}}">Home</a></li>
+    <li><a href = "{{url_for('events')}}">Events</a></li>
+    {% if current_user.is_authenticated %}
+        <li><a href = "{{url_for('account')}}">Account</a></li>
+        <li><a href = "{{url_for('logout')}}">Logout</a></li>
+    {% else %}
+        <li><a href = "{{ url_for_security('login') }}">Login</a></li>
+    {% endif %}
+</ul>
  
 <h3>Hi {{ current_user.first_name + ' ' +  current_user.second_name }}</h3>
-<a href="{{ url_for('logout')}}">Logout Here</a>
 <div>
     <h2>Profile</h2>
     {% for field, errors in form.errors.items() %}
@@ -35,3 +46,10 @@
         </div>
     </form>
 </div>
+
+<h2>Registered Races</h2>
+<ul>
+    {% for event_registration in event_registrations %}
+        <li><a href="{{ url_for('view_event', id=event_registration.event_br.id) }}">{{event_registration.event_br.server_name}}</a></li>
+    {%endfor%}
+</ul>

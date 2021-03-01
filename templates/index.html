@@ -1,1 +1,13 @@
-<h2>Welcome to the Home Page</h2>
+<h1>Welcome to the Home Page</h1>
+
+<h2>Menu</h2>
+<ul>
+    <li><a href = "{{url_for('home')}}">Home</a></li>
+    <li><a href = "{{url_for('events')}}">Events</a></li>
+    {% if current_user.is_authenticated %}
+        <li><a href = "{{url_for('account')}}">Account</a></li>
+        <li><a href = "{{url_for('logout')}}">Logout</a></li>
+    {% else %}
+        <li><a href = "{{ url_for_security('login') }}">Login</a></li>
+    {% endif %}
+</ul>

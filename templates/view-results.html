@@ -1,0 +1,40 @@
+<h2>Event Results</h2>
+
+<h2>Menu</h2>
+<ul>
+    <li><a href = "{{url_for('home')}}">Home</a></li>
+    <li><a href = "{{url_for('events')}}">Events</a></li>
+    {% if current_user.is_authenticated %}
+        <li><a href = "{{url_for('account')}}">Account</a></li>
+        <li><a href = "{{url_for('logout')}}">Logout</a></li>
+    {% else %}
+        <li><a href = "{{ url_for_security('login') }}">Login</a></li>
+    {% endif %}
+</ul>
+
+<h3>Free Practice</h3>
+<ol>
+{% for event_result in event_results %}
+    {% if event_result.session_type == 'FP'%}
+    <li>{{event_result.user_results_br.first_name}} {{event_result.user_results_br.second_name }} {{ event_result.best_sector_one }} {{ event_result.best_sector_two }} {{ event_result.best_sector_three }} {{ event_result.best_lap }}</li>
+    {% endif %}
+{%endfor%}
+</ol>
+
+<h3>Qualifying</h3>
+<ol>
+{% for event_result in event_results %}
+    {% if event_result.session_type == 'Q'%}
+    <li>{{event_result.user_results_br.first_name}} {{event_result.user_results_br.second_name }} {{ event_result.best_sector_one }} {{ event_result.best_sector_two }} {{ event_result.best_sector_three }} {{ event_result.best_lap }}</li>
+    {% endif %}
+{%endfor%}
+</ol>
+
+<h3>Race</h3>
+<ol>
+    {% for event_result in event_results %}
+        {% if event_result.session_type == 'R'%}
+        <li>{{event_result.user_results_br.first_name}} {{event_result.user_results_br.second_name }} {{ event_result.lap_count }} laps(s) {{ event_result.best_lap }} {{event_result.total_time}}</li>
+        {% endif %}
+    {%endfor%}
+</ol>
